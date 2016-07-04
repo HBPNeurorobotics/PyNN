@@ -421,5 +421,5 @@ class MusicProjection(Projection):
         for i, cell_id in enumerate(native_cell_ids):
             nest.SetStatus([cell_id], {'music_channel': i, 'port_name': port})
 
-        super(MusicProjection, self).__init__(pre_pop, postsynaptic_population, connector, synapse_type=synapse_type, source=source, receptor_type=receptor_type,
+        MusicProjection.__init__(self, pre_pop, postsynaptic_population, connector, synapse_type=synapse_type, source=source, receptor_type=receptor_type,
                 space=space, label=label)

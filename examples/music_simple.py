@@ -9,7 +9,6 @@ March 2012
 
 import numpy
 import nest
-nest.Simulate(1)
 from pyNN import music
 from pyNN.utility import get_script_args
 
