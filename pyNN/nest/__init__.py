@@ -41,7 +41,7 @@ from pyNN.nest.random import NativeRNG
 from pyNN.space import Space
 from pyNN.standardmodels import StandardCellType
 from pyNN.nest.populations import Population, PopulationView, Assembly
-from pyNN.nest.projections import Projection
+from pyNN.nest.projections import Projection, MusicProjection, music_export
 
 logger = logging.getLogger("PyNN")
 if logger.level == logging.NOTSET:

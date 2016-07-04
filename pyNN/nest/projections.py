@@ -21,6 +21,7 @@ from . import simulator
 from pyNN.random import RandomDistribution
 from .standardmodels.synapses import StaticSynapse
 from .conversion import make_sli_compatible
+from .cells import native_cell_type
 
 logger = logging.getLogger("PyNN")
 
@@ -357,3 +358,66 @@ class Projection(common.Projection):
                     value_arr *= -1  # NEST uses negative values for inhibitory weights, even if these are conductances
             all_values.append(value_arr)
         return all_values
+
+# ==============================================================================
+#   MUSIC support
+# ==============================================================================
+
+def music_export(population, port_name):
+    """
+    """
+    music_proxy = nest.Create("music_event_out_proxy",
+                              params={"port_name": port_name})
+
+    # We can't use PyNEST's ConvergentConnect here, as it does not
+    # support a params dict for the connections at the moment. Once
+    # that variant exists, we don't have to iterate here ourselves
+    # anymore
+    channel = 0
+    for pre in population:
+        conn_params = {"music_channel": channel}
+        nest.Connect([pre], music_proxy, conn_params)
+        channel += 1
+
+    def __init__(self, presynaptic_population, postsynaptic_population,
+                 connector, synapse_type=None, source=None, receptor_type=None,
+                 space=Space(), label=None):
+
+class MusicProjection(Projection):
+    event_out_proxy_cell = native_cell_type("music_event_out_proxy")
+    event_out_proxy_cell.default_parameters = {}
+    event_out_proxy_cell.default_initial_values = {}
+
+    """
+    A container for all the connections of a given type (same synapse type and
+    plasticity mechanisms) between two populations, together with methods to set
+    parameters of those connections, including of plasticity mechanisms.
+    """
+    def __init__(self, port, width, postsynaptic_population,
+                 connector, synapse_type=None, source=None, receptor_type=None,
+                 space=Space(), label=None):
+        """
+        port - MUSIC event input port name
+        width - port width (= size of remote population)
+        postsynaptic_population - Population object.
+
+        source - string specifying which attribute of the presynaptic cell
+                 signals action potentials
+
+        target - string specifying which synapse on the postsynaptic cell to
+                 connect to
+
+        If source and/or target are not given, default values are used.
+
+        method - a Connector object, encapsulating the algorithm to use for
+                 connecting the neurons.
+
+        synapse_dynamics - a `SynapseDynamics` object specifying which
+        synaptic plasticity mechanisms to use.
+
+        rng - specify an RNG object to be used by the Connector.
+        """
+        params = [{"port_name": port, "music_channel": c} for c in xrange(width)]
+        pre_pop = Population(width, event_out_proxy_cell, cellparams=params)
+        super(MusicProjection, self).__init__(pre_pop, postsynaptic_population, connector, synapse_type=synapse_type, source=source, receptor_type=receptor_type,
+                space=space, label=label)
