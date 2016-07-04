@@ -13,7 +13,7 @@ nest.Simulate(1)
 from pyNN import music
 from pyNN.utility import get_script_args
 
-sim1,sim2 = music.setup(music.Config("nest", 1), music.Config("neuron", 1))
+sim1,sim2 = music.setup(music.Config("nest", 1), music.Config("nest", 1))
 
 tstop = 1000.0
 rate = 100.0
@@ -35,9 +35,8 @@ input_population  = sim1.Population(1, sim1.SpikeSourceArray, {'spike_times': sp
 projection = music.Projection(input_population, output_population, sim2.AllToAllConnector())
 projection.set('weight', 1.0)
 
-input_population.record()
-output_population.record()
-output_population.record_v()
+input_population.record("spikes")
+output_population.record("spikes")
 
 music.run(tstop)
 

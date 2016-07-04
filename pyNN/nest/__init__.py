@@ -176,3 +176,8 @@ record_v = lambda source, filename: record(['v'], source, filename)
 record_gsyn = lambda source, filename: record(['gsyn_exc', 'gsyn_inh'], source, filename)
 
 # ==============================================================================
+
+# ==============================================================================
+#   MUSIC support
+# ==============================================================================
+music_support = True

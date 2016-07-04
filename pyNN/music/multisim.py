@@ -8,6 +8,8 @@ at once, provided those simulators support the MUSIC communication interface.
 """
 
 import music.config
+from pyNN.common.control import DEFAULT_TIMESTEP, DEFAULT_MIN_DELAY, DEFAULT_MAX_DELAY
+from pyNN.space import Space
 
 
 # This is the map between simulator(proxies) and music Application instances
@@ -129,7 +131,6 @@ def end():
 
 projection_number = 0
 
-    def __init__(self, presynaptic_population, postsynaptic_population,
 
 class Projection(object): # may wish to inherit from common.projections.Projection
     """
@@ -195,11 +196,12 @@ class Projection(object): # may wish to inherit from common.projections.Projecti
         else:
             self.projection = this_simulator.MusicProjection \
                         (self.input_port, self.width,
-                         self.postsynaptic_neurons, self.method,
-                         source=self.source, target=self.target,
-                         synapse_dynamics=self.synapse_dynamics,
-                         label=self.label, rng=self.rng)
-
+                         self.postsynaptic_neurons, self.connector,
+                         synapse_type=self.synapse_type,
+                         source=self.source,
+                         receptor_type=self.receptor_type,
+                         space=self.space,
+                         label=self.label)
 
     def __getattr__ (self, name):
         # Queued dispatch to self.projection
@@ -248,8 +250,6 @@ def input_port_name(population, unique_number):
     return 'in' + str (unique_number)
 
 
-from pyNN.common.control import DEFAULT_TIMESTEP, DEFAULT_MIN_DELAY, DEFAULT_MAX_DELAY
-from pyNN.space import Space
 
 class ProxySimulator(object):
     """

@@ -22,6 +22,7 @@ from pyNN.random import RandomDistribution
 from .standardmodels.synapses import StaticSynapse
 from .conversion import make_sli_compatible
 from .cells import native_cell_type
+from .populations import Population
 
 logger = logging.getLogger("PyNN")
 
@@ -376,17 +377,14 @@ def music_export(population, port_name):
     channel = 0
     for pre in population:
         conn_params = {"music_channel": channel}
-        nest.Connect([pre], music_proxy, conn_params)
+        nest.Connect([pre], music_proxy, 'one_to_one', conn_params)
         channel += 1
 
-    def __init__(self, presynaptic_population, postsynaptic_population,
-                 connector, synapse_type=None, source=None, receptor_type=None,
-                 space=Space(), label=None):
 
 class MusicProjection(Projection):
-    event_out_proxy_cell = native_cell_type("music_event_out_proxy")
-    event_out_proxy_cell.default_parameters = {}
-    event_out_proxy_cell.default_initial_values = {}
+    event_in_proxy_cell = native_cell_type("music_event_in_proxy")
+    event_in_proxy_cell.default_parameters = {}
+    event_in_proxy_cell.default_initial_values = {}
 
     """
     A container for all the connections of a given type (same synapse type and
@@ -417,7 +415,11 @@ class MusicProjection(Projection):
 
         rng - specify an RNG object to be used by the Connector.
         """
-        params = [{"port_name": port, "music_channel": c} for c in xrange(width)]
-        pre_pop = Population(width, event_out_proxy_cell, cellparams=params)
+        #params = [{"port_name": port, "music_channel": c} for c in xrange(width)]
+        pre_pop = Population(width, MusicProjection.event_in_proxy_cell, {})
+        native_cell_ids = map(int, pre_pop.all_cells)
+        for i, cell_id in enumerate(native_cell_ids):
+            nest.SetStatus([cell_id], {'music_channel': i, 'port_name': port})
+
         super(MusicProjection, self).__init__(pre_pop, postsynaptic_population, connector, synapse_type=synapse_type, source=source, receptor_type=receptor_type,
                 space=space, label=label)
