@@ -45,8 +45,8 @@ class Projection(common.Projection):
                  connector, synapse_type=None, source=None, receptor_type=None,
                  space=Space(), label=None):
         common.Projection.__init__(self, presynaptic_population, postsynaptic_population,
-                                   connector, synapse_type, source, receptor_type,
-                                   space, label)
+                                   connector, synapse_type=synapse_type, source=source, receptor_type=receptor_type,
+                                   space=space, label=label)
         self.nest_synapse_model = self.synapse_type._get_nest_synapse_model()
         self.nest_synapse_label = Projection._nProj
         self.synapse_type._set_tau_minus(self.post.local_cells)
@@ -391,8 +391,8 @@ class MusicProjection(Projection):
     plasticity mechanisms) between two populations, together with methods to set
     parameters of those connections, including of plasticity mechanisms.
     """
-    def __init__(self, port, width, postsynaptic_population,
-                 connector, synapse_type=None, source=None, receptor_type=None,
+    def __init__(self, port, width, postsynaptic_population,\
+                 connector, synapse_type=None, source=None, receptor_type=None,\
                  space=Space(), label=None):
         """
         port - MUSIC event input port name
@@ -420,6 +420,7 @@ class MusicProjection(Projection):
         native_cell_ids = map(int, pre_pop.all_cells)
         for i, cell_id in enumerate(native_cell_ids):
             nest.SetStatus([cell_id], {'music_channel': i, 'port_name': port})
+	print ("hellooo")
 
-        MusicProjection.__init__(self, pre_pop, postsynaptic_population, connector, synapse_type=synapse_type, source=source, receptor_type=receptor_type,
+        Projection.__init__(self, pre_pop, postsynaptic_population, connector, synapse_type=synapse_type, source=source, receptor_type=receptor_type,
                 space=space, label=label)

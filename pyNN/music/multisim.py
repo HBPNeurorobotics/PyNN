@@ -80,11 +80,13 @@ def setup(*configurations):
                 # Tell the MUSIC library to postpone setup until first
                 # port creation. Must make this call after
                 # specifications of Applications.
+		print("application is this!")
                 music.config.postponeSetup()
                 simulator = getBackend(config.name)
                 this_backend = config.name
                 simulator.name = this_backend
             else:
+		print("application is proxy")
                 simulator = ProxySimulator()
         else:
             # This seems to be an external application
@@ -269,12 +271,10 @@ class ProxySimulator(object):
               max_delay=DEFAULT_MAX_DELAY, **extra_params):
         pass
     
-    def Population(self, size, cellclass, cellparams=None, structure=None, label=None):
+    def Population(self, size, *args, **kwargs):
         return ProxyPopulation(self, size)
     
-    def Projection(self, presynaptic_neurons, postsynaptic_neurons, method,
-                   source=None, target=None, synapse_dynamics=None,
-                   label=None, rng=None):
+    def Projection(self, *args, **kwargs):
         return ProxyProjection()
 
     def AllToAllConnector (self):
